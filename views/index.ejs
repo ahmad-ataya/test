@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  </body>
+</html>
+
+
+
+
+
+<script src="http://localhost:3000/javascripts/socket.io.js"></script>
+<script>  
+	var socket = io.connect('http://localhost:3000');
+	socket.on('connect', function(){
+		socket.emit('newSms',{
+			senderName : "test",
+ 			text : "test",
+ 			phone : "0936207611"
+		});
+	});
+	
+
+	// socket.emit('s',{s:2})
+
+</script>
