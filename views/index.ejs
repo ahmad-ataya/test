@@ -11,9 +11,9 @@
 
 
 
-<script src="http://localhost:3000/javascripts/socket.io.js"></script>
+<script src="/javascripts/socket.io.js"></script>
 <script>  
-	var socket = io.connect('http://localhost:3000');
+	var socket = io.connect('');
 	socket.on('connect', function(){
 		socket.emit('newSms',{
 			senderName : "test",
