@@ -8,9 +8,9 @@ var smsSchema = new mongoose.Schema({
         default: 'pending',
         enum : ['pending','completed','refund']
     },
-
     notes : [String],
     phone : {type : String},
+
     completedBy : {type: ObjectId, ref: "User"},
     completedAt : {type: Date},
 

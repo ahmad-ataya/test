@@ -14,6 +14,10 @@ module.exports = function(server){
 	 	});
 
 	 	socket.on('newSms',function(data){
+//console.log(data.senderName)
+//console.log(data)
+try{data = JSON.parse(data)}catch(e){}
+//console.log(data);
 	 		Models.sms.create({
 	 			senderName : data.senderName,
 	 			text : data.text,
