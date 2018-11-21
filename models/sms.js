@@ -2,15 +2,21 @@
 var smsSchema = new mongoose.Schema({
 	senderName : String,
 	text : String,
-    completed: {
-        type: Boolean,
+    status: {
+        type: String,
         required: true,
-        default: false
+        default: 'pending',
+        enum : ['pending','completed','refund']
     },
-    notes : ["String"],
+
+    notes : [String],
     phone : {type : String},
     completedBy : {type: ObjectId, ref: "User"},
     completedAt : {type: Date},
+
+    refundBy : {type: ObjectId, ref: "User"},
+    refundAt : {type: Date},
+
     creationDate : {type: Date, default: Date.now}
 });
 
