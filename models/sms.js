@@ -8,7 +8,7 @@ var smsSchema = new mongoose.Schema({
         default: false
     },
     notes : ["String"],
-    phone : {type : String},
+    phone : {type : String,default : "-"},
     completedBy : {type: ObjectId, ref: "User"},
     completedAt : {type: Date},
     creationDate : {type: Date, default: Date.now}
