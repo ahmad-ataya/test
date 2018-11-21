@@ -266,6 +266,7 @@
       'autoWidth'   : false
     });
 
+  <% if(active == 'view'){ %>
     $('#example2').on('click','.completeAction',function(){
       var node  = $(this);
       
@@ -311,43 +312,45 @@
           else
             alert("error "+data.message);
         });
+    });
+
+    function getJwt()
+    {
+      var re = new RegExp("jwt=([^;]+)");
+      var value = re.exec(document.cookie);
+      return (value != null) ? unescape(value[1]) : null;
+    }
+    var socket = io.connect('http://localhost:3000');
+    socket.on('connect', function(){
+      console.log('a user connected');
+      socket.emit('authenticate',{token : getJwt()});
+      socket.on('unAutentication',function(data){
+        // window.location.replace("/auth/login");
+      });
+      socket.on('newSms',function(data){
+        var node = table.row.add([
+              data._id,
+              data.senderName,
+              data.phone,
+              data.text,
+              data.creationDate,
+              data.notes,
+              '<button class=" completeAction btn btn-flat btn-success">complete</button><button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button>'
+
+          ]);
+        node.draw(false);
+        
+
+        $(node.node()).attr('smsId',data._id)
       });
 
-      function getJwt()
-      {
-        var re = new RegExp("jwt=([^;]+)");
-        var value = re.exec(document.cookie);
-        return (value != null) ? unescape(value[1]) : null;
-      }
-      var socket = io.connect('http://localhost:3000');
-      socket.on('connect', function(){
-        console.log('a user connected');
-        socket.emit('authenticate',{token : getJwt()});
-        socket.on('unAutentication',function(data){
-          // window.location.replace("/auth/login");
-        });
-        socket.on('newSms',function(data){
-          var node = table.row.add([
-                data._id,
-                data.senderName,
-                data.phone,
-                data.text,
-                data.creationDate,
-                data.notes,
-                '<button class=" completeAction btn btn-flat btn-success">complete</button><button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button>'
+      socket.on('smsComplited',function(data){
+        table.row($("tr[smsId="+data.smsId+"]")).remove().draw();
+      })
 
-            ]);
-          node.draw(false);
-          
+    });
+<% }%>
 
-          $(node.node()).attr('smsId',data._id)
-        });
-
-        socket.on('smsComplited',function(data){
-          table.row($("tr[smsId="+data.smsId+"]")).remove().draw();
-        })
-
-      });
     });
 
 </script>
