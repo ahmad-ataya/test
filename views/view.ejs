@@ -283,7 +283,7 @@
           <label for="exampleInputPassword1">representative</label>
           <select class="form-control representativeSelect" style="width: 100%;">
             <% representative.forEach(function(rep){ %>
-              <option value="<%= rep._id %>"><% rep.name %></option>
+              <option value="<%= rep._id %>"><%= rep.name %></option>
             <% }) %>
           </select>
           <!-- <input type="text" class="noteValue form-control"  placeholder="Note" id="reoId"> -->
