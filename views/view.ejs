@@ -293,7 +293,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-        <button type="button"  smsId="" id="assignAction" class="btn btn-primary" >save</button>
+        <button type="button"  smsId="" id="assignAction" class="btn btn-primary" >assign</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -449,7 +449,7 @@
         },
         function(data, status,xhr){
           if(xhr.status == 200){
-            table.row($("td[smsId="+smsId+"]").parents('tr')).remove().draw();
+            table.row($("tr[smsId="+smsId+"]")).remove().draw();
             // var notes = $("tr[smsId="+smsId+"]").children().eq(5);
             // notes.html(notes.html()+','+note);
             $('#modal-assignToRepresentative').modal('toggle');
