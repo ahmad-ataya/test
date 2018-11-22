@@ -110,7 +110,7 @@
           </a>
           <ul class="treeview-menu">
             <li class="<% if(active == 'view'){ %> active <%}%>"><a href="/"><i class="fa fa-circle-o"></i>pending</a></li>
-            <% counter = 0;  banks.forEach(function(bank){ counter++; %>
+            <% banks.forEach(function(bank){ %>
               <li class="<% if(active == bank.senderName){ %> active <%}%>"><a href="/?bank=<%=bank.senderName%>"><i class="fa fa-circle-o"></i> <%=bank.title%></a></li>
             <% }); %>
             <li class="<% if(active == 'refund'){ %> active <%}%>"><a href="/refund"><i class="fa fa-circle-o"></i> refund</a></li>
@@ -203,7 +203,9 @@
                           <button class=" completeAction btn btn-flat btn-success">complete</button>
                           <button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button>
                           <button class=" refundAction btn btn-flat btn-warning">refund</button>
+                          <% if(mainActive != 'rep'){ %>
                           <button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>
+                          <% } %>
                         </td>
                       <% } %>
                     </tr>
@@ -440,7 +442,6 @@
       var node  = $(this);
       var smsId = node.attr('smsId');
       var repId = $('.representativeSelect').val();
-      alert(repId);
       $.post("/sms/assign",
         {
           smsId: smsId,
@@ -451,7 +452,7 @@
             table.row($("td[smsId="+smsId+"]").parents('tr')).remove().draw();
             // var notes = $("tr[smsId="+smsId+"]").children().eq(5);
             // notes.html(notes.html()+','+note);
-            // $('#modal-default').modal('toggle');
+            $('#modal-assignToRepresentative').modal('toggle');
             console.log("Data: " + data.message + "\nStatus: " + status);
           }
           else
