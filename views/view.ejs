@@ -19,6 +19,9 @@
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="/template/dist/css/skins/_all-skins.min.css">
+  <!-- select -->
+<link rel="stylesheet" href="/template/bower_components/select2/dist/css/select2.min.css">
+
 
 
   <!-- Google Font -->
@@ -98,7 +101,7 @@
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
-        <li class="treeview active">
+        <li class="treeview <% if(mainActive == 'dash'){ %> active<%}%>">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Dashboard</span>
             <span class="pull-right-container">
@@ -108,17 +111,29 @@
           <ul class="treeview-menu">
             <li class="<% if(active == 'view'){ %> active <%}%>"><a href="/"><i class="fa fa-circle-o"></i>pending</a></li>
             <% counter = 0;  banks.forEach(function(bank){ counter++; %>
-              <li class="<% if(active == bank._id){ %> active <%}%>"><a href="/?bank=<%=bank.senderName%>"><i class="fa fa-circle-o"></i> <%=bank.title%></a></li>
+              <li class="<% if(active == bank.senderName){ %> active <%}%>"><a href="/?bank=<%=bank.senderName%>"><i class="fa fa-circle-o"></i> <%=bank.title%></a></li>
             <% }); %>
             <li class="<% if(active == 'refund'){ %> active <%}%>"><a href="/refund"><i class="fa fa-circle-o"></i> refund</a></li>
             <li class="<% if(active == 'completed'){ %> active <%}%>"><a href="/completed"><i class="fa fa-circle-o"></i> completed</a></li>
+          </ul>
+        </li>
+        <li class="treeview <% if(mainActive == 'rep'){ %> active<%}%>">
+          <a href="#">
+            <i class="fa fa-dashboard"></i> <span>Representative</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <% counter = 0;  representative.forEach(function(rep){  %>
+              <li class="<% if(active == rep._id){ %> active <%}%>"><a href="/?rep=<%=rep._id%>"><i class="fa fa-circle-o"></i> <%=rep.name%></a></li>
+            <% }); %>
           </ul>
         </li>
       </ul>
     </section>
     <!-- /.sidebar -->
   </aside>
-
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -137,6 +152,10 @@
             <div class="box-header">
               <h3 class="box-title"></h3>
             </div>
+            <div class="row">
+              <div class="col-xs-10 col-md-11 "></div>
+              <button class="btn btn-success" data-toggle="modal" data-target="#modal-add-hawala">Add</button>
+            </div>
             <!-- /.box-header -->
             <div class="box-body">
               <table id="example2" class="table table-bordered table-striped">
@@ -148,33 +167,45 @@
                     <th>text</th>
                     <th>creation Date</th>
                     <th>notes</th>
-                    <% if(active != 'completed'){ %>
-                      <th>actions</th>
-                    <% }else{%>
+                    <% if(active == 'completed'){ %>
                       <th>completed by</th>
                       <th>completed at</th>
-                    <% } %>
+                    <% }else if(active == 'refund'){ %>
+                      <th>refund by</th>
+                      <th>refund at</th>
+                      <th>actions</th>
+                      <% }else { %>
+                        <th>actions</th>
+                      <% } %>
                   </tr>
                 </thead>
                 <tbody>
-                    <% counter = 0;  allSms.forEach(function(sms){ counter++; %>
+                    <% allSms.forEach(function(sms){ counter++; %>
                     <tr smsId = <%=sms.id%>>
                       <td><%=sms._id.toString()%></td>
                       <td><%=sms.senderName%></td>
                       <td><%=sms.phone%></td>
                       <td><%=sms.text%></td>
-                      <td><%=moment(sms.creationDate).format();%></td>
+                      <td><%=moment(sms.creationDate).format('Y-M-D h:m');%></td>
                       <td ><%=sms.notes%></td>
-                      <% if(active != 'completed'){ %>
-                        <td smsId = <%=sms.id%>>
+                      <% if(active == 'completed'){ %>
+                        <td ><%=sms.completedBy.name ||'-' %></td>
+                        <td><%=moment(sms.completedAt).format('Y-M-D h:m');%></td>
+                      <% }else if(active == 'refund'){ %>
+                        <td ><%=sms.refundBy.name ||'-' %></td>
+                        <td><%=moment(sms.refundAt).format('Y-M-D h:m');%></td>
+                        <td>
+                          <button class=" completeAction btn btn-flat btn-success">complete</button>
+                          <button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button>
+                        </td>
+                      <% }else { %>
+                        <td>
                           <button class=" completeAction btn btn-flat btn-success">complete</button>
                           <button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button>
                           <button class=" refundAction btn btn-flat btn-warning">refund</button>
+                          <button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>
                         </td>
-                      <% }else{%>
-                        <td ><%=sms.completedBy.name ||'-' %></td>
-                        <td><%=moment(sms.completedAt).format();%></td>
-                      <% }; %>
+                      <% } %>
                     </tr>
                   <% }); %>
                 </tbody>
@@ -238,6 +269,71 @@
 </div>
 <!-- /.modal -->
 
+<!-- /modal -->
+<div class="modal fade" id="modal-assignToRepresentative">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 id="assignTitle" class="modal-title">assign #</h4>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+          <label for="exampleInputPassword1">representative</label>
+          <select class="form-control representativeSelect" style="width: 100%;">
+            <% representative.forEach(function(rep){ %>
+              <option value="<%= rep._id %>"><% rep.name %></option>
+            <% }) %>
+          </select>
+          <!-- <input type="text" class="noteValue form-control"  placeholder="Note" id="reoId"> -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="button"  smsId="" id="assignAction" class="btn btn-primary" >save</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- /modal  add hawala-->
+<div class="modal fade" id="modal-add-hawala">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 id="noteTitle" class="modal-title">Add Hawala #</h4>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+          <label for="exampleInputPassword1">Sender Name</label>
+          <input type="text" class="noteValue form-control"  placeholder="senderName" required="required" id="hawalaSenderName" >
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Phone</label>
+          <input type="text" class="noteValue form-control"  placeholder="phone" required="required" id="hawalaPhone" >
+        </div>
+         <div class="form-group">
+          <label for="exampleInputPassword1">text</label>
+          <input type="text" class="noteValue form-control"  placeholder="text" required="required" id="hawalaText">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="button"  id="addHawala" class="btn btn-primary" data-dismiss="modal" >save</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
 <!-- jQuery 3 -->
 <script src="/template/bower_components/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap 3.3.7 -->
@@ -251,16 +347,20 @@
 <script src="/template/bower_components/fastclick/lib/fastclick.js"></script>
 <!-- AdminLTE App -->
 <script src="/template/dist/js/adminlte.min.js"></script>
+<!-- select  -->
+<script src="/template/bower_components/select2/dist/js/select2.full.min.js"></script>
 <!-- page script -->
 <script src="/javascripts/socket.io.js"></script>
 <script>
   var activePage = "<%=active%>"
   $(function () {
+    $('.representativeSelect').select2();
     var table = $('#example2').DataTable({
       'paging'      : true,
       'lengthChange': true,
       'searching'   : true,
       'ordering'    : true,
+      'order': [[ 0, "desc" ]],
       'info'        : true,
       'autoWidth'   : false
     });
@@ -329,6 +429,36 @@
         });
     });
 
+     $('#example2').on('click','.assignButton',function(){
+      var node  = $(this);
+      $('#assignTitle').html("assign #"+node.parents('tr').attr('smsId'));
+      $('#assignAction').attr("smsId",node.parents('tr').attr('smsId'));
+
+    });
+
+    $('#assignAction').click(function(){
+      var node  = $(this);
+      var smsId = node.attr('smsId');
+      var repId = $('.representativeSelect').val();
+      alert(repId);
+      $.post("/sms/assign",
+        {
+          smsId: smsId,
+          repId : repId
+        },
+        function(data, status,xhr){
+          if(xhr.status == 200){
+            table.row($("td[smsId="+smsId+"]").parents('tr')).remove().draw();
+            // var notes = $("tr[smsId="+smsId+"]").children().eq(5);
+            // notes.html(notes.html()+','+note);
+            // $('#modal-default').modal('toggle');
+            console.log("Data: " + data.message + "\nStatus: " + status);
+          }
+          else
+            alert("error "+data.message);
+        });
+    });
+
     function getJwt()
     {
       var re = new RegExp("jwt=([^;]+)");
@@ -343,7 +473,7 @@
         // window.location.replace("/auth/login");
       });
       socket.on('newSms',function(data){
-        if(activePage == 'view'){
+        if(activePage == 'view' || activePage == data.senderName){
           var node = table.row.add([
                 data._id,
                 data.senderName,
@@ -351,21 +481,30 @@
                 data.text,
                 data.creationDate,
                 data.notes,
-                '<button class=" completeAction btn btn-flat btn-success">complete</button><button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button><button class=" refundAction btn btn-flat btn-warning">refund</button>'
+                '<button class=" completeAction btn btn-flat btn-success">complete</button><button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button><button class=" refundAction btn btn-flat btn-warning">refund</button><button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>'
             ]);
           node.draw(false);
           table.order([0,'desc']);
           $(node.node()).attr('smsId',data._id)
         }
-        // if(activePage == data.senderName){
-
-        // }
       });
 
       socket.on('smsComplited',function(data){
         table.row($("tr[smsId="+data.smsId+"]")).remove().draw();
       });
 
+    });
+
+    $('#addHawala').click(function(){
+      socket.emit('newSms',{
+        senderName : $('#hawalaSenderName').val(),
+        phone : $('#hawalaPhone').val(),
+        text : $('#hawalaText').val(),
+        from : 'web'
+      });
+      $('#hawalaSenderName').val('');
+      $('#hawalaPhone').val('');
+      $('#hawalaText').val('');
     });
   <% } %>
 
