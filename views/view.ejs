@@ -353,6 +353,7 @@
 <script src="/template/bower_components/select2/dist/js/select2.full.min.js"></script>
 <!-- page script -->
 <script src="/javascripts/socket.io.js"></script>
+<script src="/javascripts/moment.js"></script>
 <script>
   var activePage = "<%=active%>"
   $(function () {
@@ -466,7 +467,8 @@
       var value = re.exec(document.cookie);
       return (value != null) ? unescape(value[1]) : null;
     }
-    var socket = io.connect('');
+    var socket = io.connect('http://68.183.70.136/');
+    // var socket = io.connect('http://127.0.0.1:3000/');
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
@@ -480,7 +482,7 @@
                 data.senderName,
                 data.phone,
                 data.text,
-                data.creationDate,
+                moment(data.creationDate).format('Y-M-D h:m'),
                 data.notes,
                 '<button class=" completeAction btn btn-flat btn-success">complete</button><button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button><button class=" refundAction btn btn-flat btn-warning">refund</button><button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>'
             ]);

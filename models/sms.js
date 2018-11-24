@@ -24,5 +24,6 @@ var smsSchema = new mongoose.Schema({
 });
 
 smsSchema.index({ status: 1 });
+smsSchema.index({ senderName: 1 });
 
 module.exports = mongoose.model('Sms', smsSchema);
