@@ -11,6 +11,9 @@ var smsSchema = new mongoose.Schema({
     notes : [String],
     phone : {type : String},
 
+    deviceEmitTime : String,
+    serviceCenterTime : String,
+
     completedBy : {type: ObjectId, ref: "User"},
     completedAt : {type: Date},
 

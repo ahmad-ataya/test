@@ -186,14 +186,14 @@
                       <td><%=sms.senderName%></td>
                       <td><%=sms.phone%></td>
                       <td><%=sms.text%></td>
-                      <td><%=moment(sms.creationDate).format('Y-M-D h:m');%></td>
+                      <td><%=moment(sms.creationDate).add(2, 'hours').format('Y-M-D h:m');%></td>
                       <td ><%=sms.notes%></td>
                       <% if(active == 'completed'){ %>
                         <td ><%=sms.completedBy.name ||'-' %></td>
-                        <td><%=moment(sms.completedAt).format('Y-M-D h:m');%></td>
+                        <td><%=moment(sms.completedAt).add(2, 'hours').format('Y-M-D h:m');%></td>
                       <% }else if(active == 'refund'){ %>
                         <td ><%=sms.refundBy.name ||'-' %></td>
-                        <td><%=moment(sms.refundAt).format('Y-M-D h:m');%></td>
+                        <td><%=moment(sms.refundAt).add(2, 'hours').format('Y-M-D h:m');%></td>
                         <td>
                           <button class=" completeAction btn btn-flat btn-success">complete</button>
                           <button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button>
@@ -467,16 +467,22 @@
       var value = re.exec(document.cookie);
       return (value != null) ? unescape(value[1]) : null;
     }
+
+
+
+
     var socket = io.connect('http://68.183.70.136/');
     // var socket = io.connect('http://127.0.0.1:3000/');
+    // socket.on('disconnect', (reason) => {
+// });
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
       socket.on('unAutentication',function(data){
-        // window.location.replace("/auth/login");
+        window.location.replace("/auth/login");
       });
       socket.on('newSms',function(data){
-        if(activePage == 'view' || activePage == data.senderName){
+        if((activePage == 'view' || activePage == data.senderName) && $("tr[smsId="+data._id+"]").length == 0 ){
           var node = table.row.add([
                 data._id,
                 data.senderName,

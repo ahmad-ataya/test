@@ -9,6 +9,14 @@ router.get('/newSms',function(req,res){
     return res.render('index')
 });
 
+router.get('/getAll',function(req,res){
+    Models.sms.find(req.query,function(err,allSms){
+        if(err)
+            return res.json(err);
+        return  res.json(allSms);
+    }); 
+});
+
 
 router.use(passport.authenticate('jwt', {session : false,failureRedirect : '/auth/login',failureMessage : {message :'pleaseTryAgain'}}));
 router.use(function(req,res,next){// refreshToken
