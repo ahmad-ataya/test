@@ -471,8 +471,8 @@
 
 
 
-    var socket = io.connect('http://68.183.70.136/');
-    // var socket = io.connect('http://127.0.0.1:3000/');
+    // var socket = io.connect('http://68.183.70.136/');
+    var socket = io.connect('http://127.0.0.1:3000/');
     // socket.on('disconnect', (reason) => {
 // });
     socket.on('connect', function(){
@@ -482,7 +482,7 @@
         window.location.replace("/auth/login");
       });
       socket.on('newSms',function(data){
-        if((activePage == 'view' || activePage == data.senderName) && $("tr[smsId="+data._id+"]").length == 0 ){
+        if((activePage == 'view' || activePage == data.senderName) /*&& $("tr[smsId="+data._id+"]").length == 0 */){
           var node = table.row.add([
                 data._id,
                 data.senderName,
@@ -500,6 +500,13 @@
 
       socket.on('smsComplited',function(data){
         table.row($("tr[smsId="+data.smsId+"]")).remove().draw();
+      });
+
+      socket.on('disconnect',function(data){
+        socket.off('newSms');
+        socket.off('smsComplited');
+
+        console.log(Object.keys(socket));
       });
 
     });
