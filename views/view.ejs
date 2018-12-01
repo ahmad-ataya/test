@@ -74,7 +74,7 @@
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                  <a id="signOut" class="btn btn-default btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
@@ -114,6 +114,7 @@
               <li class="<% if(active == bank.senderName){ %> active <%}%>"><a href="/?bank=<%=bank.senderName%>"><i class="fa fa-circle-o"></i> <%=bank.title%></a></li>
             <% }); %>
             <li class="<% if(active == 'refund'){ %> active <%}%>"><a href="/refund"><i class="fa fa-circle-o"></i> refund</a></li>
+            <li class="<% if(active == 'withoutOrders'){ %> active <%}%>"><a href="/withoutOrders"><i class="fa fa-circle-o"></i> without orders</a></li>
             <li class="<% if(active == 'completed'){ %> active <%}%>"><a href="/completed"><i class="fa fa-circle-o"></i> completed</a></li>
           </ul>
         </li>
@@ -170,6 +171,9 @@
                     <% if(active == 'completed'){ %>
                       <th>completed by</th>
                       <th>completed at</th>
+                      <% if(user.isAdmin){ %>
+                        <th>actions</th>
+                      <% } %>
                     <% }else if(active == 'refund'){ %>
                       <th>refund by</th>
                       <th>refund at</th>
@@ -191,6 +195,11 @@
                       <% if(active == 'completed'){ %>
                         <td ><%=sms.completedBy.name ||'-' %></td>
                         <td><%=moment(sms.completedAt).add(2, 'hours').format('Y-M-D h:m');%></td>
+                        <% if(user.isAdmin){ %>
+                          <td>
+                            <button class="uncompleteAction btn btn-flat btn-danger">uncompleted</button>
+                          </td>
+                        <% } %>
                       <% }else if(active == 'refund'){ %>
                         <td ><%=sms.refundBy.name ||'-' %></td>
                         <td><%=moment(sms.refundAt).add(2, 'hours').format('Y-M-D h:m');%></td>
@@ -324,6 +333,10 @@
           <label for="exampleInputPassword1">text</label>
           <input type="text" class="noteValue form-control"  placeholder="text" required="required" id="hawalaText">
         </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">date</label>
+          <input type="datetime-local" class="noteValue form-control"  placeholder="date" required="required" value="2018-01-01T00:00" id="hawalaDate">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
@@ -368,17 +381,33 @@
       'autoWidth'   : false
     });
 
-  <% if(active != 'completed'){ %>
     $('#example2').on('click','.completeAction',function(){
       var node  = $(this);
-      
-      $.post("/sms/completed",{
+      var smsId = node.parents('tr').attr('smsId');
+      var cpnfirmation = confirm("are you shore complete this #"+smsId);
+      if(cpnfirmation){
+        $.post("/sms/completed",{
+            smsId:smsId
+          },
+          function(data, status,xhr){
+            if(xhr.status == 200){
+              // table.row( node.parents('tr') ).remove().draw();
+              console.log("Data: " + data.message + "\nStatus: " + status);
+            }
+            else
+              alert("error "+data.message);
+        });
+      }
+    });
+
+     $('#example2').on('click','.uncompleteAction',function(){
+      var node  = $(this);
+      $.post("/sms/uncompleted",{
           smsId: node.parents('tr').attr('smsId')
         },
         function(data, status,xhr){
           if(xhr.status == 200){
-            // table.row( node.parents('tr') ).remove().draw();
-            console.log("Data: " + data.message + "\nStatus: " + status);
+            table.row( node.parents('tr') ).remove().draw();
           }
           else
             alert("error "+data.message);
@@ -405,6 +434,12 @@
       var node  = $(this);
       $('#noteTitle').html("add note #"+node.parents('tr').attr('smsId'));
       $('#addNoteAction').attr("smsId",node.parents('tr').attr('smsId'));
+
+    });
+
+    $('#signOut').click(function(){
+      document.cookie = "jwt = signOut";
+      window.location.replace("/auth/login");
 
     });
 
@@ -480,7 +515,7 @@
         window.location.replace("/auth/login");
       });
       socket.on('newSms',function(data){
-        if((activePage == 'view' || activePage == data.senderName) /*&& $("tr[smsId="+data._id+"]").length == 0 */){
+        if((activePage == 'view' || activePage == data.senderName)){
           var node = table.row.add([
                 data._id,
                 data.senderName,
@@ -500,27 +535,31 @@
         table.row($("tr[smsId="+data.smsId+"]")).remove().draw();
       });
 
+      socket.on('smsWithoutOrders',function(data){
+        data.forEach(function(d){
+          table.row($("tr[smsId="+d._id+"]")).remove().draw();
+        });
+      });
+
       socket.on('disconnect',function(data){
         socket.off('newSms');
         socket.off('smsComplited');
 
-        console.log(Object.keys(socket));
       });
 
     });
-
     $('#addHawala').click(function(){
       socket.emit('newSms',{
         senderName : $('#hawalaSenderName').val(),
         phone : $('#hawalaPhone').val(),
         text : $('#hawalaText').val(),
+        creationDate : $('#hawalaDate').val(),
         from : 'web'
       });
       $('#hawalaSenderName').val('');
       $('#hawalaPhone').val('');
       $('#hawalaText').val('');
     });
-  <% } %>
 
     });
 

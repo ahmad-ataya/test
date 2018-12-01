@@ -2,9 +2,24 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 
+var cron = require('node-cron');
+ 
+cron.schedule('*/59 * * * *', () => {  // every 59 hours 
+    var dateNow = new Date();
+    var before24Date = new Date(dateNow.setDate(dateNow.getDate()-1));
+    // var before24Date = dateNow;
+
+    Models.sms.find({status : 'pending', creationDate  : {$lt : before24Date } },'id',function(err,smsWithoutOrders){
+        Models.sms.update({status : 'pending', creationDate  : {$lt : before24Date } },{status : 'withoutOrders'},{multi: true},function(err,result){
+            console.log(result);
+        });
+        io.emit('smsWithoutOrders',smsWithoutOrders);
+    }); 
+});
 
 router.use('/auth', require('./auth'));
 router.use('/banks', require('./banks'));
+router.use('/users', require('./users'));
 router.get('/newSms',function(req,res){
     return res.render('index')
 });
@@ -67,6 +82,22 @@ router.get('/completed', function(req, res, next) {
     });
 });
 
+router.get('/withoutOrders', function(req, res, next) {
+    Models.banks.find({},function(err,banks){
+        if(err)
+            return res.json(err);
+        Models.user.find({isRepresentative : true},function(err,allRep){
+        if(err)
+            return res.json(err);
+            Models.sms.find({status : 'withoutOrders'}).exec(function(err,allSms){
+                if(err)
+                    return res.json(err); 
+                return res.render('view', {mainActive : 'dash',active : 'withoutOrders', user: req.user, allSms : allSms, banks:banks, representative : allRep});
+            }); 
+        });
+    });
+});
+
 router.get('/refund', function(req, res, next) {
     Models.banks.find({},function(err,banks){
         if(err)
@@ -87,7 +118,7 @@ router.get('/refund', function(req, res, next) {
 router.post('/sms/completed', function(req, res, next) {
     if(!req.body.smsId)
         return res.status(400).json({message : 'id is required'});
-    var updateData = {status : 'completed',completedBy :req.user.id,completedAt : Date.now()};
+    var updateData = {status : 'withoutOrders',completedBy :req.user.id,completedAt : Date.now()};
     Models.sms.update({_id: ObjectId(req.body.smsId)},updateData,function(err,result){
         if(err)
             return res.status(500).json(err); 
@@ -95,6 +126,25 @@ router.post('/sms/completed', function(req, res, next) {
         return res.status(200).json({message : 'done'});
     }); 
 });
+
+router.post('/sms/uncompleted', function(req, res, next) {
+    if(!req.body.smsId)
+        return res.status(400).json({message : 'id is required'});
+    var updateData = {status : 'pending'};
+    Models.sms.update({_id: ObjectId(req.body.smsId)},updateData,function(err,result){
+        if(err)
+            return res.status(500).json(err);
+
+        Models.sms.findOne({_id: ObjectId(req.body.smsId)},function(err,sms){
+            if(err)
+                return res.status(500).json(err);
+
+            io.emit("newSms",sms);
+            return res.status(200).json({message : 'done'});
+        }); 
+    }); 
+});
+
 router.post('/sms/refund', function(req, res, next) {
     if(!req.body.smsId)
         return res.status(400).json({message : 'id is required'});

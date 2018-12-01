@@ -22,6 +22,10 @@ var userSchema = new mongoose.Schema({
     isRepresentative : {
         type  : Boolean,
         default : false
+    },
+    isAdmin : {
+        type : Boolean,
+        default : false
     }
 });
 

@@ -6,7 +6,7 @@ var smsSchema = new mongoose.Schema({
         type: String,
         required: true,
         default: 'pending',
-        enum : ['pending','completed','refund','assigned']
+        enum : ['pending','completed','refund','assigned','withoutOrders']
     },
     notes : [String],
     phone : {type : String},

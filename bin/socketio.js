@@ -23,6 +23,7 @@ module.exports = function(server){
 	 			phone : data.phone,
 	 			from : data.from,
 	 			deviceEmitTime : data.deviceEmitTime,
+	 			creationDate : data.creationDate?new Date(data.creationDate) : undefined,
 	 			serviceCenterTime : data.serviceCenterTime
 	 		},function(err,sms){
 	 			if(err)
