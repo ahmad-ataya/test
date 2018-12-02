@@ -571,8 +571,8 @@
 
 
 
-    var socket = io.connect('http://68.183.70.136/');
-    // var socket = io.connect('http://127.0.0.1:3000/');
+    // var socket = io.connect('http://68.183.70.136/');
+    var socket = io.connect('http://127.0.0.1:3000/');
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
@@ -580,7 +580,7 @@
         window.location.replace("/auth/login");
       });
       socket.on('newSms',function(data){
-        if(activePage == 'view' &&  !rep){
+        if(activePage == 'view' &&  !rep && (!bank || data.senderName == bank)){
           node = table.row.add(data);
 
           table.settings()[0].oFeatures.bServerSide = false;
