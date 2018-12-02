@@ -17,7 +17,7 @@ var smsSchema = new mongoose.Schema({
     completedBy : {type: ObjectId, ref: "User"},
     completedAt : {type: Date},
 
-    toRepresentative : {type : ObjectId, ref : "user"},
+    toRepresentative : {type : ObjectId, ref : "User"},
 
     refundBy : {type: ObjectId, ref: "User"},
     refundAt : {type: Date},

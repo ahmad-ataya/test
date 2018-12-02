@@ -72,23 +72,25 @@ router.get('/completed', function(req, res, next) {
 router.post('/ajaxList', function(req, res, next) {
     // populate
         var populate = '';
-        if(req.body.status == 'completed')
+        if(req.body.activePage == 'completed')
             populate = 'completedBy';
-        else if(req.body.status == 'refund')
+        else if(req.body.activePage == 'refund')
             populate = 'refundBy';
+        else if(req.body.bank)
+            populate = 'toRepresentative';
         req.body.populate = populate;
-    // status
-        if(req.body.status == 'view')
-            req.body.status = 'pending';
+    // activePage
+        if(req.body.activePage == 'view')
+            req.body.activePage = 'pending';
     
-    req.body.extraWhere = { status : req.body.status};
+    req.body.extraWhere = { status : req.body.activePage};
     if(req.body.rep){
         req.body.extraWhere.toRepresentative = req.body.rep; 
         req.body.extraWhere.status = 'assigned';
     }
     if(req.body.bank){
         req.body.extraWhere.senderName = req.body.bank; 
-        req.body.status = 'pending';
+        delete req.body.extraWhere.status;
     }
     req.body.extraSelect = { status : 1};
 
