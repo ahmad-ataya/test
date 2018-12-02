@@ -22,25 +22,11 @@
   <!-- select -->
 <link rel="stylesheet" href="/template/bower_components/select2/dist/css/select2.min.css">
 
-  
+
 
   <!-- Google Font -->
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-
-
-        <style type="text/css">
-          .AlahliSMSStyle { background-color: #16a765;}
-          .BankAlbiladStyle { background-color: #fdedc1;}
-          .alinmabankStyle { background-color: #cca6ac;}
-          .AlRajhiBankStyle { background-color: #4986e7;}
-          .ANBStyle { background-color: #a2dcc1;}
-          .FransiSMSStyle { background-color: #f2b2a8;}
-          .AlJaziraSMSStyle {background-color: #98d7e4;}
-          .RiyadBankStyle  {background-color: #ffad46;}
-          .SABBStyle  {background-color: #b99aff;}
-          .SambaStyle  {background-color: #b6cff5;}
-        </style>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -123,11 +109,9 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class="<% if(active == 'view' && !rep && !bank){ %> active <%}%>"><a href="/"><i class="fa fa-circle-o"></i>pending</a></li>
-            <% banks.forEach(function(b){ %>
-              <li class="<% if(bank == b.senderName){ %> active <%}%>"><a href="/?bank=<%=b.senderName%>"><i class="fa fa-circle-o"></i> 
-                <span class ="badge <%=b.senderName%>Style" ><%=b.title%></span></a>
-              </li>
+            <li class="<% if(active == 'view'){ %> active <%}%>"><a href="/"><i class="fa fa-circle-o"></i>pending</a></li>
+            <% banks.forEach(function(bank){ %>
+              <li class="<% if(active == bank.senderName){ %> active <%}%>"><a href="/?bank=<%=bank.senderName%>"><i class="fa fa-circle-o"></i> <%=bank.title%></a></li>
             <% }); %>
             <li class="<% if(active == 'refund'){ %> active <%}%>"><a href="/refund"><i class="fa fa-circle-o"></i> refund</a></li>
             <li class="<% if(active == 'withoutOrders'){ %> active <%}%>"><a href="/withoutOrders"><i class="fa fa-circle-o"></i> without orders</a></li>
@@ -142,8 +126,8 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <% counter = 0;  representative.forEach(function(r){  %>
-              <li class="<% if(rep == r._id){ %> active <%}%>"><a href="/?rep=<%=r._id%>"><i class="fa fa-circle-o"></i> <%=r.name%></a></li>
+            <% counter = 0;  representative.forEach(function(rep){  %>
+              <li class="<% if(active == rep._id){ %> active <%}%>"><a href="/?rep=<%=rep._id%>"><i class="fa fa-circle-o"></i> <%=rep.name%></a></li>
             <% }); %>
           </ul>
         </li>
@@ -190,16 +174,11 @@
                       <% if(user.isAdmin){ %>
                         <th>actions</th>
                       <% } %>
-                    <% }else if(active == 'refund'){ %>
-                      <th>refund by</th>
-                      <th>refund at</th>
-                      <th>actions</th>
-                      <% }else { %>
-                        <th>actions</th>
-                      <% } %>
+                    <% } %>
                   </tr>
                 </thead>
                 <tbody>
+                    
                 </tbody>
               </table>
             </div>
@@ -349,62 +328,30 @@
 <script src="/javascripts/socket.io.js"></script>
 <script src="/javascripts/moment.js"></script>
 <script>
-  var activePage = "<%=active%>";
-  var isAdmin = "<%=user.isAdmin%>";
-  var rep = "<%=rep%>";
-  var bank = "<%=bank%>";
-  function DateRender(date){
-    return moment(date).format('Y-M-D h:m');
-  }
-  function senderNameRender(senderName){
-
-    return '<span class="badge '+senderName.replace('.','')+'Style" >'+senderName+'</span>';
-  }
-  function getColumns(status){
-    var completeButton = '<button class=" completeAction btn btn-flat btn-success">complete</button>';
-    var refundButton = '<button class=" refundAction btn btn-flat btn-warning">refund</button>';
-    var noteButton = '<button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default">add Note</button>';
-    var assignButton = '<button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>';
-    var uncompleteButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">uncompleted</button>':'';
-    var columns = [
-      { "data": "_id" },
-      { "data": "senderName" ,render : senderNameRender},
-      { "data": "phone" },
-      { "data": "text" },
-      { "data": "creationDate" ,render : DateRender},
-      { "data": "notes" },
-    ];
-    if(status == 'completed')
-      columns.push({ "data": "completedBy.name" },{ "data": "completedAt",render : DateRender},{"data":null,"defaultContent":uncompleteButton});
-    else if(status == 'refund')
-      columns.push({ "data": "refundBy.name" },{ "data": "refundAt",render : DateRender},{"data":null,"defaultContent":completeButton+noteButton});
-    else if(status == 'withoutOrders')
-      columns.push({"data":null,"defaultContent":completeButton+noteButton+refundButton+assignButton});
-    else
-      columns.push({"data":null,"defaultContent":completeButton+noteButton+refundButton+assignButton});
-    return columns;
-  }
+  var activePage = "<%=active%>"
   $(function () {
     $('.representativeSelect').select2();
     var table = $('#example2').DataTable({
       serverSide : true,
       ajax : {
-        url : '/ajaxList',
-        type : 'POST',
-        "data": {
-            "status": activePage,
-            bank : bank,
-            rep : rep
-        }
+        url : '/completed',
+        type : 'POST'
       },
       "processing": true,
-      "columns": getColumns(activePage),
+      "columns": [
+            { "data": "_id" },
+            { "data": "senderName" },
+            { "data": "phone" },
+            { "data": "text" },
+            { "data": "creationDate" },
+            { "data": "notes" },
+            { "data": "completedBy.name" },
+            { "data": "completedAt"},
+            {"data":null,"defaultContent":'<button class="uncompleteAction btn btn-flat btn-danger">uncompleted</button>'}
+      ],
       createdRow: function( row, data, dataIndex ) {
           $(row).attr('smsId', data._id); 
       },
-      columnDefs: [
-          // { targets: 4, "width": "11%", render: $.fn.dataTable.render.moment('Do MMM YYYYY') }
-     ],
       'paging'      : true,
       'lengthChange': true,
       'searching'   : true,
@@ -417,7 +364,7 @@
     $('#example2').on('click','.completeAction',function(){
       var node  = $(this);
       var smsId = node.parents('tr').attr('smsId');
-      var cpnfirmation = confirm("are you shure complete this #"+smsId);
+      var cpnfirmation = confirm("are you shore complete this #"+smsId);
       if(cpnfirmation){
         $.post("/sms/completed",{
             smsId:smsId
@@ -435,39 +382,32 @@
 
      $('#example2').on('click','.uncompleteAction',function(){
       var node  = $(this);
-      var smsId = node.parents('tr').attr('smsId');
-      var cpnfirmation = confirm("are you shure uncomplete this #"+smsId);
-      if(cpnfirmation){
-        $.post("/sms/uncompleted",{
-            smsId: smsId
-          },
-          function(data, status,xhr){
-            if(xhr.status == 200){
-              table.row( node.parents('tr') ).remove().draw();
-            }
-            else
-              alert("error "+data.message);
-        });
-      }
+      $.post("/sms/uncompleted",{
+          smsId: node.parents('tr').attr('smsId')
+        },
+        function(data, status,xhr){
+          if(xhr.status == 200){
+            table.row( node.parents('tr') ).remove().draw();
+          }
+          else
+            alert("error "+data.message);
+      });
     });
 
     $('#example2').on('click','.refundAction',function(){
       var node  = $(this);
-      var smsId = node.parents('tr').attr('smsId');
-      var cpnfirmation = confirm("are you shure refund this #"+smsId);
-      if(cpnfirmation){
-        $.post("/sms/refund",{
-            smsId: smsId
-          },
-          function(data, status,xhr){
-            if(xhr.status == 200){
-              // table.row( node.parents('tr') ).remove().draw();
-              console.log("Data: " + data.message + "\nStatus: " + status);
-            }
-            else
-              alert("error "+data.message);
-        });
-      }
+      
+      $.post("/sms/refund",{
+          smsId: node.parents('tr').attr('smsId')
+        },
+        function(data, status,xhr){
+          if(xhr.status == 200){
+            // table.row( node.parents('tr') ).remove().draw();
+            console.log("Data: " + data.message + "\nStatus: " + status);
+          }
+          else
+            alert("error "+data.message);
+      });
     });
 
     $('#example2').on('click','.addNoteButton',function(){
@@ -546,8 +486,8 @@
 
 
 
-    var socket = io.connect('http://68.183.70.136/');
-    // var socket = io.connect('http://127.0.0.1:3000/');
+    // var socket = io.connect('http://68.183.70.136/');
+    var socket = io.connect('http://127.0.0.1:3000/');
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
@@ -555,15 +495,19 @@
         window.location.replace("/auth/login");
       });
       socket.on('newSms',function(data){
-        if((activePage == 'view')){
-          node = table.row.add(data);
-
-          table.settings()[0].oFeatures.bServerSide = false;
-          
+        if((activePage == 'view' || activePage == data.senderName)){
+          var node = table.row.add([
+                data._id,
+                data.senderName,
+                data.phone,
+                data.text,
+                moment(data.creationDate).format('Y-M-D h:m'),
+                data.notes,
+                '<button class=" completeAction btn btn-flat btn-success">complete</button><button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default" >add Note</button><button class=" refundAction btn btn-flat btn-warning">refund</button><button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>'
+            ]);
           node.draw(false);
           table.order([0,'desc']);
-          
-          table.settings()[0].oFeatures.bServerSide = true;
+          $(node.node()).attr('smsId',data._id)
         }
       });
 

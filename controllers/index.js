@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var dataTableQuery = require('../libraries/datatables-query')(Models.sms);
 
 var cron = require('node-cron');
  
@@ -48,20 +49,10 @@ router.get('/', function(req, res, next) {
         Models.user.find({isRepresentative : true},function(err,allRep){
         if(err)
             return res.json(err);
-            var where = {status : 'pending'};
-            if(req.query.bank) where.senderName = req.query.bank;
-            if(req.query.rep) {
-                where.status = 'assigned'
-                where.toRepresentative = req.query.rep;
-            }
-            
-            Models.sms.find(where,function(err,allSms){
-                if(err)
-                    return res.json(err);
-                var activePage  = req.query.bank || req.query.rep || 'view';
-                var mainActive = req.query.rep?'rep':'dash';
-                return res.render('view', {mainActive : mainActive, active : activePage, user: req.user, allSms : allSms, banks:banks, representative : allRep});
-            }); 
+
+            var activePage  = 'view';
+            var mainActive = req.query.rep?'rep':'dash';
+            return res.render('view', {mainActive : mainActive, active : activePage, user: req.user, banks:banks, representative : allRep,bank : req.query.bank,rep : req.query.rep});
         });
     });
 });
@@ -71,14 +62,42 @@ router.get('/completed', function(req, res, next) {
         if(err)
             return res.json(err);
         Models.user.find({isRepresentative : true},function(err,allRep){
-        if(err)
-            return res.json(err);
-            Models.sms.find({status : 'completed'}).populate('completedBy').exec(function(err,allSms){
-                if(err)
-                    return res.json(err); 
-                return res.render('view', {mainActive : 'dash',active : 'completed', user: req.user, allSms : allSms, banks:banks, representative : allRep});
-            }); 
+            if(err)
+                return res.json(err);
+            return res.render('view', {mainActive : 'dash',active : 'completed', user: req.user, banks:banks, representative : allRep,rep:req.query.rep,bank:req.query.bank}); 
         });
+    });
+});
+
+router.post('/ajaxList', function(req, res, next) {
+    // populate
+        var populate = '';
+        if(req.body.status == 'completed')
+            populate = 'completedBy';
+        else if(req.body.status == 'refund')
+            populate = 'refundBy';
+        req.body.populate = populate;
+    // status
+        if(req.body.status == 'view')
+            req.body.status = 'pending';
+    
+    req.body.extraWhere = { status : req.body.status};
+    if(req.body.rep){
+        req.body.extraWhere.toRepresentative = req.body.rep; 
+        req.body.extraWhere.status = 'assigned';
+    }
+    if(req.body.bank){
+        req.body.extraWhere.senderName = req.body.bank; 
+        req.body.status = 'pending';
+    }
+    req.body.extraSelect = { status : 1};
+
+    // console.log(req.bo)
+
+    dataTableQuery.run(req.body).then(function (data) {
+        return res.status(200).json(data);
+    }, function (err) {
+        return res.status(500).json(err);
     });
 });
 
@@ -87,13 +106,9 @@ router.get('/withoutOrders', function(req, res, next) {
         if(err)
             return res.json(err);
         Models.user.find({isRepresentative : true},function(err,allRep){
-        if(err)
-            return res.json(err);
-            Models.sms.find({status : 'withoutOrders'}).exec(function(err,allSms){
-                if(err)
-                    return res.json(err); 
-                return res.render('view', {mainActive : 'dash',active : 'withoutOrders', user: req.user, allSms : allSms, banks:banks, representative : allRep});
-            }); 
+            if(err)
+                return res.json(err);
+            return res.render('view', {mainActive : 'dash',active : 'withoutOrders', user: req.user,  banks:banks, representative : allRep,rep:req.query.rep,bank : req.query.bank});
         });
     });
 });
@@ -103,14 +118,9 @@ router.get('/refund', function(req, res, next) {
         if(err)
             return res.json(err);
         Models.user.find({isRepresentative : true},function(err,allRep){
-        if(err)
-            return res.json(err);
-            Models.sms.find({status : 'refund'}).populate('refundBy').exec(function(err,allSms){
-                if(err)
-                    return res.json(err); 
-                io.emit("smsComplited",{smsId : req.body.smsId});
-                return res.render('view', {mainActive : 'dash',active : 'refund', user: req.user, allSms : allSms, banks:banks, representative : allRep });
-            }); 
+            if(err)
+                return res.json(err);
+            return res.render('view', {mainActive : 'dash',active : 'refund', user: req.user,  banks:banks, representative : allRep,rep:req.query.rep,bank : req.query.bank });
         });
     });
 });
@@ -118,7 +128,7 @@ router.get('/refund', function(req, res, next) {
 router.post('/sms/completed', function(req, res, next) {
     if(!req.body.smsId)
         return res.status(400).json({message : 'id is required'});
-    var updateData = {status : 'withoutOrders',completedBy :req.user.id,completedAt : Date.now()};
+    var updateData = {status : 'completed',completedBy :req.user.id,completedAt : Date.now()};
     Models.sms.update({_id: ObjectId(req.body.smsId)},updateData,function(err,result){
         if(err)
             return res.status(500).json(err); 
