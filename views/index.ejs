@@ -15,14 +15,28 @@
 <script>  
 	var socket = io.connect('');
 	socket.on('connect', function(){
-	for (var i = 0; i< 10; i++) {
+	for (var i = 0; i< 100; i++) {
 		socket.emit('newSms',{
 			senderName : "alRajhi",
  			text : i,
  			phone : "0936207611"
-		});
+		}, function (data) { // args are sent in order to acknowledgement function
+	       console.log(data); // data will be 'tobi says woot'
+	    });
 	}
-	});
+});
+	// setInterval(function(argument) {
+	// 	socket.emit('newSms',{
+	// 		senderName : "alRajhi",
+ // 			text : 0,
+ // 			phone : "0936207611"
+	// 	}, function (data) { // args are sent in order to acknowledgement function
+	//        console.log(data); // data will be 'tobi says woot'
+	//     });
+	// 	// console.log(x);
+	// },1000)
+	// });
+
 	
 
 	// socket.emit('s',{s:2})

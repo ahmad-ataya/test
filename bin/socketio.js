@@ -14,8 +14,10 @@ module.exports = function(server){
 	 		});
 	 	});
 
-	 	socket.on('newSms',function(data){
+	 	socket.on('newSms',function(data,callback){
 			try{data = JSON.parse(data)}catch(e){}
+	 		if(typeof callback == 'function')
+	 			callback('success')
 			// console.log(data);
 	 		Models.sms.create({
 	 			senderName : data.senderName,
