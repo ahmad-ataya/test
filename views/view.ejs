@@ -44,6 +44,10 @@
           .completedStyle  {background-color: #008d4c;}
           .refundStyle  {background-color: #f39c12;}
           .assignedStyle  {background-color: #00acd6;}
+
+          .completeHighlight {background-color : #c9fcab  !important;}
+          .refundHighlight {background-color : #ffd189 !important;}
+          .assignHighlight {background-color : #85e5fc !important;}
         </style>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
@@ -441,58 +445,77 @@
 
     $('#example2').on('click','.completeAction',function(){
       var node  = $(this);
-      var smsId = node.parents('tr').attr('smsId');
-      var cpnfirmation = confirm("are you shure complete this #"+smsId);
-      if(cpnfirmation){
-        $.post("/sms/completed",{
-            smsId:smsId
-          },
-          function(data, status,xhr){
-            if(xhr.status == 200){
-              // table.row( node.parents('tr') ).remove().draw();
-              console.log("Data: " + data.message + "\nStatus: " + status);
-            }
-            else
-              alert("error "+data.message);
-        });
-      }
+      
+      node.parents('tr').addClass('completeHighlight')
+
+      setTimeout(function(){
+        var smsId = node.parents('tr').attr('smsId');
+        var cpnfirmation = confirm("are you shure complete this #"+smsId);
+        node.parents('tr').removeClass('completeHighlight')
+        
+        if(cpnfirmation){
+          $.post("/sms/completed",{
+              smsId:smsId
+            },
+            function(data, status,xhr){
+              if(xhr.status == 200){
+                // table.row( node.parents('tr') ).remove().draw();
+                console.log("Data: " + data.message + "\nStatus: " + status);
+              }
+              else
+                alert("error "+data.message);
+          });
+        }
+      },20);
     });
 
      $('#example2').on('click','.uncompleteAction',function(){
       var node  = $(this);
-      var smsId = node.parents('tr').attr('smsId');
-      var cpnfirmation = confirm("are you shure uncomplete this #"+smsId);
-      if(cpnfirmation){
-        $.post("/sms/uncompleted",{
-            smsId: smsId
-          },
-          function(data, status,xhr){
-            if(xhr.status == 200){
-              table.row( node.parents('tr') ).remove().draw();
-            }
-            else
-              alert("error "+data.message);
-        });
-      }
+
+      node.parents('tr').addClass('completeHighlight')
+
+      setTimeout(function(){
+        var smsId = node.parents('tr').attr('smsId');
+        var cpnfirmation = confirm("are you shure uncomplete this #"+smsId);
+        node.parents('tr').removeClass('completeHighlight')
+        
+        if(cpnfirmation){
+          $.post("/sms/uncompleted",{
+              smsId: smsId
+            },
+            function(data, status,xhr){
+              if(xhr.status == 200){
+                table.row( node.parents('tr') ).remove().draw();
+              }
+              else
+                alert("error "+data.message);
+          });
+        }
+      },20);  
     });
 
     $('#example2').on('click','.refundAction',function(){
       var node  = $(this);
       var smsId = node.parents('tr').attr('smsId');
-      var cpnfirmation = confirm("are you shure refund this #"+smsId);
-      if(cpnfirmation){
-        $.post("/sms/refund",{
-            smsId: smsId
-          },
-          function(data, status,xhr){
-            if(xhr.status == 200){
-              // table.row( node.parents('tr') ).remove().draw();
-              console.log("Data: " + data.message + "\nStatus: " + status);
-            }
-            else
-              alert("error "+data.message);
-        });
-      }
+      node.parents('tr').addClass('refundHighlight')
+      setTimeout(function(){
+
+        var cpnfirmation = confirm("are you shure refund this #"+smsId);
+        node.parents('tr').removeClass('refundHighlight')
+        if(cpnfirmation){
+          $.post("/sms/refund",{
+              smsId: smsId
+            },
+            function(data, status,xhr){
+              if(xhr.status == 200){
+                // table.row( node.parents('tr') ).remove().draw();
+                console.log("Data: " + data.message + "\nStatus: " + status);
+              }
+              else
+                alert("error "+data.message);
+          });
+        }
+      });
     });
 
     $('#example2').on('click','.addNoteButton',function(){
@@ -534,6 +557,7 @@
 
      $('#example2').on('click','.assignButton',function(){
       var node  = $(this);
+
       $('#assignTitle').html("assign #"+node.parents('tr').attr('smsId'));
       $('#assignAction').attr("smsId",node.parents('tr').attr('smsId'));
 

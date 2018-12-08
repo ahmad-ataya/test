@@ -13742,9 +13742,13 @@
 		 */
 		"fnRecordsDisplay": function ()
 		{
-			return _fnDataSource( this ) == 'ssp' ?
-				this._iRecordsDisplay * 1 :
-				this.aiDisplay.length;
+			if(this.oFeatures.bServerSide){   // Ataya 
+				return _fnDataSource( this ) == 'ssp' ?
+					this._iRecordsDisplay * 1 :
+					this.aiDisplay.length;	
+			} 
+			else // Ataya 
+				return this._iRecordsDisplay+1;// Ataya 
 		},
 	
 		/**
