@@ -377,6 +377,7 @@
 <!-- page script -->
 <script src="/javascripts/socket.io.js"></script>
 <script src="/javascripts/moment.js"></script>
+<script src="/javascripts/moment-timezone.js"></script>
 <script>
   var activePage = "<%=active%>";
   var isAdmin = "<%=user.isAdmin%>";
@@ -391,7 +392,7 @@
   var assignButton = '<button class=" assignButton btn btn-flat btn-info" data-toggle="modal" data-target="#modal-assignToRepresentative">assign</button>';
 
   function DateRender(date){
-    return moment(date).format('Y-M-D h:m');
+    return moment.tz(date,'Asia/Riyadh').format('Y-M-D H:m ');
   }
   function senderNameRender(senderName){
     return '<span class="badge '+senderName.replace('.','')+'Style" >'+senderName+'</span>';
