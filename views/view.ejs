@@ -380,12 +380,13 @@
 <script src="/javascripts/moment-timezone.js"></script>
 <script>
   var activePage = "<%=active%>";
-  var isAdmin = "<%=user.isAdmin%>";
+  var isAdmin = ("<%=user.isAdmin%>" == 'true');
   var rep = "<%=rep%>";
   var bank = "<%=bank%>";
   var ifBankAll = "<%=ifBankAll%>";
   
-  var uncompleteButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">uncompleted</button>':'';
+  var uncompleteButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo complete</button>':'';
+  var unRefundButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo refund</button>':'';
   var completeButton = '<button class=" completeAction btn btn-flat btn-success">complete</button>';
   var refundButton = '<button class=" refundAction btn btn-flat btn-warning">refund</button>';
   var noteButton = '<button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default">add Note</button>';
@@ -408,7 +409,7 @@
     if(status == 'completed')
       return uncompleteButton;
     if(status == 'refund')
-      return noteButton;
+      return noteButton+unRefundButton;
     if(status == 'withoutOrders')
       return completeButton+noteButton+refundButton+assignButton;
     if(status == 'assigned')
@@ -498,7 +499,7 @@
 
       setTimeout(function(){
         var smsId = node.parents('tr').attr('smsId');
-        var cpnfirmation = confirm("are you shure uncomplete this #"+smsId);
+        var cpnfirmation = confirm("are you shure unndo complete this #"+smsId);
         node.parents('tr').removeClass('completeHighlight')
         
         if(cpnfirmation){
