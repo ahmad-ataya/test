@@ -52,7 +52,7 @@ router.get('/', function(req, res, next) {
 
             var activePage  = 'view';
             var mainActive = req.query.rep?'rep':'dash';
-            return res.render('view', {mainActive : mainActive, active : activePage, user: req.user, banks:banks, representative : allRep,bank : req.query.bank,rep : req.query.rep});
+            return res.render('view', {mainActive : mainActive, active : activePage, user: req.user, banks:banks, representative : allRep,bank : req.query.bank,rep : req.query.rep,ifBankAll : req.query.ifBankAll});
         });
     });
 });
@@ -64,7 +64,7 @@ router.get('/completed', function(req, res, next) {
         Models.user.find({isRepresentative : true},function(err,allRep){
             if(err)
                 return res.json(err);
-            return res.render('view', {mainActive : 'dash',active : 'completed', user: req.user, banks:banks, representative : allRep,rep:req.query.rep,bank:req.query.bank}); 
+            return res.render('view', {mainActive : 'dash',active : 'completed', user: req.user, banks:banks, representative : allRep,rep:req.query.rep,bank:req.query.bank,ifBankAll : req.query.ifBankAll}); 
         });
     });
 });
@@ -88,10 +88,10 @@ router.post('/ajaxList', function(req, res, next) {
         req.body.extraWhere.toRepresentative = req.body.rep; 
         req.body.extraWhere.status = 'assigned';
     }
-    if(req.body.bank){
+    if(req.body.bank)
         req.body.extraWhere.senderName = req.body.bank; 
+    if(req.body.ifBankAll)
         delete req.body.extraWhere.status;
-    }
     req.body.extraSelect = { status : 1};
 
     // console.log(req.bo)
@@ -110,7 +110,7 @@ router.get('/withoutOrders', function(req, res, next) {
         Models.user.find({isRepresentative : true},function(err,allRep){
             if(err)
                 return res.json(err);
-            return res.render('view', {mainActive : 'dash',active : 'withoutOrders', user: req.user,  banks:banks, representative : allRep,rep:req.query.rep,bank : req.query.bank});
+            return res.render('view', {mainActive : 'dash',active : 'withoutOrders', user: req.user,  banks:banks, representative : allRep,rep:req.query.rep,bank : req.query.bank,ifBankAll : req.query.ifBankAll});
         });
     });
 });
@@ -122,7 +122,7 @@ router.get('/refund', function(req, res, next) {
         Models.user.find({isRepresentative : true},function(err,allRep){
             if(err)
                 return res.json(err);
-            return res.render('view', {mainActive : 'dash',active : 'refund', user: req.user,  banks:banks, representative : allRep,rep:req.query.rep,bank : req.query.bank });
+            return res.render('view', {mainActive : 'dash',active : 'refund', user: req.user,  banks:banks, representative : allRep,rep:req.query.rep,bank : req.query.bank,ifBankAll : req.query.ifBankAll });
         });
     });
 });

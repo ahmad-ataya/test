@@ -30,7 +30,7 @@
 
 
         <style type="text/css">
-          .AlahliSMSStyle { background-color: #16a765;}
+          .AlahliSMSStyle { background-color: #16a765;} 
           .BankAlbiladStyle { background-color: #fdedc1;}
           .alinmabankStyle { background-color: #cca6ac;}
           .AlRajhiBankStyle { background-color: #4986e7;}
@@ -123,7 +123,7 @@
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
-        <li class="treeview <% if(mainActive == 'dash'){ %> active<%}%>">
+        <li class="treeview <% if(mainActive == 'dash' && !ifBankAll){ %> active<%}%>">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Dashboard</span>
             <span class="pull-right-container">
@@ -133,7 +133,7 @@
           <ul class="treeview-menu">
             <li class="<% if(active == 'view' && !rep && !bank){ %> active <%}%>"><a href="/"><i class="fa fa-circle-o"></i>pending</a></li>
             <% banks.forEach(function(b){ %>
-              <li class="<% if(bank == b.senderName){ %> active <%}%>"><a href="/?bank=<%=b.senderName%>"><i class="fa fa-circle-o"></i> 
+              <li class="<% if(bank == b.senderName && !ifBankAll){ %> active <%}%>"><a href="/?bank=<%=b.senderName%>"><i class="fa fa-circle-o"></i> 
                 <span class ="badge <%=b.senderName%>Style" ><%=b.title%></span></a>
               </li>
             <% }); %>
@@ -142,6 +142,23 @@
             <li class="<% if(active == 'completed'){ %> active <%}%>"><a href="/completed"><i class="fa fa-circle-o"></i> completed</a></li>
           </ul>
         </li>
+
+        <li class="treeview <% if(ifBankAll){ %> active<%}%>">
+          <a href="#">
+            <i class="fa fa-dashboard"></i> <span>Banks</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <% banks.forEach(function(b){ %>
+              <li class="<% if(bank == b.senderName && ifBankAll){ %> active <%}%>"><a href="/?bank=<%=b.senderName%>&ifBankAll=true"><i class="fa fa-circle-o"></i> 
+                <span class ="badge <%=b.senderName%>Style" ><%=b.title%></span></a>
+              </li>
+            <% }); %>
+          </ul>
+        </li>
+
         <li class="treeview <% if(mainActive == 'rep'){ %> active<%}%>">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Representative</span>
@@ -155,6 +172,7 @@
             <% }); %>
           </ul>
         </li>
+
       </ul>
     </section>
     <!-- /.sidebar -->
@@ -364,6 +382,7 @@
   var isAdmin = "<%=user.isAdmin%>";
   var rep = "<%=rep%>";
   var bank = "<%=bank%>";
+  var ifBankAll = "<%=ifBankAll%>";
   
   var uncompleteButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">uncompleted</button>':'';
   var completeButton = '<button class=" completeAction btn btn-flat btn-success">complete</button>';
@@ -398,7 +417,7 @@
   }
   function getColumns(activePage){
     var columns = [
-      { "data": "_id" },
+      { "data": "_id" ,render : function(id){return id.substr(18)}},
       { "data": "senderName" ,render : senderNameRender},
       { "data": "phone" },
       { "data": "text" },
@@ -427,7 +446,8 @@
         "data": {
             "activePage": activePage,
             bank : bank,
-            rep : rep
+            rep : rep,
+            ifBankAll : ifBankAll
         }
       },
       processing: true,
@@ -596,8 +616,8 @@
 
 
 
-    var socket = io.connect('http://68.183.70.136/');
-    // var socket = io.connect('http://127.0.0.1:3000/');
+    // var socket = io.connect('http://68.183.70.136/');
+    var socket = io.connect('http://127.0.0.1:3000/');
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
