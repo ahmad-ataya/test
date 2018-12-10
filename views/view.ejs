@@ -387,6 +387,7 @@
   
   var uncompleteButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo complete</button>':'';
   var unRefundButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo refund</button>':'';
+  var unAssignButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo assign</button>':'';
   var completeButton = '<button class=" completeAction btn btn-flat btn-success">complete</button>';
   var refundButton = '<button class=" refundAction btn btn-flat btn-warning">refund</button>';
   var noteButton = '<button class=" addNoteButton btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-default">add Note</button>';
@@ -413,7 +414,7 @@
     if(status == 'withoutOrders')
       return completeButton+noteButton+refundButton+assignButton;
     if(status == 'assigned')
-      return noteButton;
+      return noteButton+unAssignButton;
     return completeButton+noteButton+refundButton+assignButton;
 
   }
@@ -473,7 +474,7 @@
 
       setTimeout(function(){
         var smsId = node.parents('tr').attr('smsId');
-        var cpnfirmation = confirm("are you shure complete this #"+smsId);
+        var cpnfirmation = confirm("are you shure complete this #"+smsId.substr(18));
         node.parents('tr').removeClass('completeHighlight')
         
         if(cpnfirmation){
@@ -499,7 +500,7 @@
 
       setTimeout(function(){
         var smsId = node.parents('tr').attr('smsId');
-        var cpnfirmation = confirm("are you shure unndo complete this #"+smsId);
+        var cpnfirmation = confirm("are you shure unndo complete this #"+smsId.substr(18));
         node.parents('tr').removeClass('completeHighlight')
         
         if(cpnfirmation){
@@ -523,7 +524,7 @@
       node.parents('tr').addClass('refundHighlight')
       setTimeout(function(){
 
-        var cpnfirmation = confirm("are you shure refund this #"+smsId);
+        var cpnfirmation = confirm("are you shure refund this #"+smsId.substr(18));
         node.parents('tr').removeClass('refundHighlight')
         if(cpnfirmation){
           $.post("/sms/refund",{
