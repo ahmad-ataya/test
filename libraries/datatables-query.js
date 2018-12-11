@@ -188,7 +188,7 @@ var async = require('async'),
                 recordsFiltered;
                 Object.assign(findParameters, params.extraWhere || {});  // ataya
                 Object.assign(selectParameters, params.extraSelect || {});  // ataya
-                console.log(findParameters)
+                // console.log(findParameters)
             return new Promise(function (fullfill, reject) {
 
                 async.series([

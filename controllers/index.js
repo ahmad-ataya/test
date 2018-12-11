@@ -19,10 +19,18 @@ cron.schedule('*/59 * * * *', () => {  // every 59 hours
 });
 
 router.use('/auth', require('./auth'));
-router.use('/banks', require('./banks'));
-router.use('/users', require('./users'));
-router.get('/newSms',function(req,res){
-    return res.render('index')
+// router.use('/banks', require('./banks'));
+// router.use('/users', require('./users'));
+// router.get('/newSms',function(req,res){
+//     return res.render('index')
+// });
+
+
+
+router.use(passport.authenticate('jwt', {session : false,failureRedirect : '/auth/login',failureMessage : {message :'pleaseTryAgain'}}));
+router.use(function(req,res,next){// refreshToken
+    // res.set('Authorization',req.get('Authorization'));
+    return  next();
 });
 
 router.get('/getAll',function(req,res){
@@ -32,14 +40,6 @@ router.get('/getAll',function(req,res){
         return  res.json(allSms);
     }); 
 });
-
-
-router.use(passport.authenticate('jwt', {session : false,failureRedirect : '/auth/login',failureMessage : {message :'pleaseTryAgain'}}));
-router.use(function(req,res,next){// refreshToken
-    // res.set('Authorization',req.get('Authorization'));
-    return  next();
-});
-
 
 
 router.get('/', function(req, res, next) {
