@@ -6,19 +6,6 @@ var jwt = require('jwt-simple');
 
 
 
-// router.post('/signup',function(req, res) {
-//     if(!req.body.email || !req.body.password)
-//         return res.status(400).json({message : 'email And password required'});
-
-//     req.body.email.toLowerCase();
-//     Models.user.create(req.body, function(err, data) {
-//         if (err)
-//             return res.status(500).json(err);
-//         return res.status(201).json(data);
-//     });
-// });
-
-
 router.get('/login',function(req,res){
     res.render('login');
 })

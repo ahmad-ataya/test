@@ -1,7 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-
+router.use('/',function(req,res,next){
+	if(!req.user || !req.user.isAdmin)
+        return res.status(500).json({message : 'permssionDenied'});
+    return next();
+});
 
 
 router.post('/',function(req, res) {
