@@ -48,7 +48,8 @@
           .completeHighlight {background-color : #c9fcab  !important;}
           .refundHighlight {background-color : #ffd189 !important;}
           .assignHighlight {background-color : #85e5fc !important;}
-        </style>
+          table#example2 tbody > tr > td:nth-child(6) {word-break : break-word !important;}
+	</style>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -425,7 +426,7 @@
       { "data": "phone" },
       { "data": "text" },
       { "data": "creationDate" ,render : DateRender},
-      { "data": "notes" },
+      { "data": "notes", "width" :"200px" ,render : function(r){return r;} },
     ];
     if(bank) 
       columns.push({ "data" : "toRepresentative.name", "defaultContent": '-'});
@@ -619,8 +620,8 @@
 
 
 
-    var socket = io.connect('http://68.183.70.136/');
-    // var socket = io.connect('http://127.0.0.1:3000/');
+    var socket = io.connect('http://68.183.70.136:3000/');
+    //var socket = io.connect('http://127.0.0.1:3000/');
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
