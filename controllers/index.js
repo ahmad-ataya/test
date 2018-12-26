@@ -20,6 +20,7 @@ cron.schedule('*/59 * * * *', () => {  // every 59 hours
 
 router.use('/auth', require('./auth'));
 
+//router.use('/users', require('./users'));
 
 
 router.use(passport.authenticate('jwt', {session : false,failureRedirect : '/auth/login',failureMessage : {message :'pleaseTryAgain'}}));
