@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
-
+/*
 router.use('/',function(req,res,next){
 	if(!req.user || !req.user.isAdmin)
         return res.status(500).json({message : 'permssionDenied'});
     return next();
 });
-
+*/
 router.get('/',function(req,res){
 	Models.user.find(req.query,function(err,data){
 		return res.json(data);
