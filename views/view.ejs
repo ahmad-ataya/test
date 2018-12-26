@@ -573,7 +573,7 @@
       var node  = $(this);
       var smsId = node.attr('smsId');
       var note = encodeURIComponent(node.attr('note'));
-
+      
       $.ajax({
           url: "/sms/"+smsId+"/notes/"+note,
           type: 'DELETE',
@@ -668,6 +668,7 @@
 
 
     var socket = io.connect('http://68.183.70.136:3000/');
+    // var socket = io.connect('http://localhost:3000/');
     socket.on('connect', function(){
       console.log('a user connected');
       socket.emit('authenticate',{token : getJwt()});
@@ -716,7 +717,7 @@
         senderName : $('#hawalaSenderName').val(),
         phone : $('#hawalaPhone').val(),
         text : $('#hawalaText').val(),
-        creationDate : $('#hawalaDate').val(),
+        creationDate : moment($('#hawalaDate').val()).zone('Asia/Riyadh'),
         from : 'web'
       });
       $('#hawalaSenderName').val('');
