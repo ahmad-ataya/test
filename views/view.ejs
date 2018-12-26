@@ -572,8 +572,8 @@
     $('#notesTable').on('click','#removeNote',function(){
       var node  = $(this);
       var smsId = node.attr('smsId');
-      var note = node.attr('note');
-      console.log();
+      var note = encodeURIComponent(node.attr('note'));
+
       $.ajax({
           url: "/sms/"+smsId+"/notes/"+note,
           type: 'DELETE',
