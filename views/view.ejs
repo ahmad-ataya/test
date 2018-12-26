@@ -274,6 +274,14 @@
         <h4 id="noteTitle" class="modal-title">Add note #</h4>
       </div>
       <div class="modal-body">
+        <div id="notesTable">
+          <table class="table table-striped table-bordered" >
+            <tr>
+              <td>sad</td>
+            </tr>
+          </table>
+        </div>
+
          <div class="form-group">
           <label for="exampleInputPassword1">Note</label>
           <input type="text" class="noteValue form-control"  placeholder="Note" id="note">
@@ -328,7 +336,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 id="noteTitle" class="modal-title">Add Hawala #</h4>
+        <h4 id="addHawalaTitle" class="modal-title">Add Hawala #</h4>
       </div>
       <div class="modal-body">
          <div class="form-group">
@@ -539,14 +547,53 @@
                 alert("error "+data.message);
           });
         }
-      });
+      },20);
     });
 
     $('#example2').on('click','.addNoteButton',function(){
       var node  = $(this);
-      $('#noteTitle').html("add note #"+node.parents('tr').attr('smsId'));
-      $('#addNoteAction').attr("smsId",node.parents('tr').attr('smsId'));
+      var smsId = node.parents('tr').attr('smsId');
+      $('#noteTitle').html("add note #"+smsId);
+      $('#addNoteAction').attr("smsId",smsId);
 
+      $('#note').val('');
+      
+      var notes = node.parent().siblings().eq(5).text();
+      notes = notes.split(',');
+      var notesHtml ='<table class="table table-striped table-bordered">';
+      notes.forEach(function(note){
+        if(note  != '')
+          notesHtml += '<tr><td>'+note+'</td><td id="removeNote" class="btn btn-danger" smsId = "'+smsId+'" note = "'+note+'">remove</td></tr>';
+      });notesHtml += '</table>';
+      $('#notesTable').html(notesHtml);
+    });
+
+    $('#notesTable').on('click','#removeNote',function(){
+      var node  = $(this);
+      var smsId = node.attr('smsId');
+      var note = node.attr('note');
+      console.log();
+      $.ajax({
+          url: "/sms/"+smsId+"/notes/"+note,
+          type: 'DELETE',
+          success: function(result) {
+            node.parents('tr').remove();
+            $("tr[smsId="+smsId+"]").children().eq(5).text(result.notes);
+          }
+      });
+
+      // $('#noteTitle').html("add note #"+smsId);
+      // $('#addNoteAction').attr("smsId",smsId);
+
+      // $('#note').val('');
+      
+      // var notes = node.parent().siblings().eq(5).text();
+      // notes = notes.split(',');
+      // var notesHtml ='<table class="table table-striped table-bordered">';
+      // notes.forEach(function(note){
+      //   notesHtml += '<tr><td>'+note+'</td><td id="removeNote" class="btn btn-danger" smsId = "'+smsId+'" note = "'+note+'">remove</td></tr>';
+      // });notesHtml += '</table>';
+      // $('#notesTable').html(notesHtml);
     });
 
     $('#signOut').click(function(){
@@ -619,7 +666,7 @@
 
 
 
-    var socket = io.connect('http://68.183.70.136/');
+    var socket = io.connect('http://68.183.70.136:3000/');
     // var socket = io.connect('http://127.0.0.1:3000/');
     socket.on('connect', function(){
       console.log('a user connected');

@@ -197,4 +197,27 @@ router.post('/sms/assign', function(req, res, next) {
         return res.status(200).json({message : 'done'});
     }); 
 });
+
+
+router.delete('/sms/:smsId/notes/:note',function(req,res,next){
+    Models.sms.findOne({_id: ObjectId(req.params.smsId)},function(err,sms){
+        if(err)
+            return res.status(500).json(err);
+
+        if(!sms)
+            return res.status(404).json({message : 'smsNotFound'});
+        var index = sms.notes.indexOf(req.params.note);
+        console.log(index);
+        if (index > -1)
+            sms.notes.splice(index, 1);
+        console.log(sms.notes);
+
+        sms.save((err)=>{
+            if(err)
+                return res.status(500).json(err);
+            return res.status(202).json({message : 'done',notes : sms.notes});
+
+        });
+    }); 
+});
 module.exports = router;
