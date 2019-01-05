@@ -30,16 +30,16 @@
 
 
         <style type="text/css">
-          .AlahliSMSStyle { background-color: #16a765;} 
-          .BankAlbiladStyle { background-color: #fdedc1;}
+          .alahlismsStyle { background-color: #16a765;} 
+          .bankalbiladStyle { background-color: #fdedc1;}
           .alinmabankStyle { background-color: #cca6ac;}
-          .AlRajhiBankStyle { background-color: #4986e7;}
-          .ANBStyle { background-color: #a2dcc1;}
-          .FransiSMSStyle { background-color: #f2b2a8;}
-          .AlJaziraSMSStyle {background-color: #98d7e4;}
-          .RiyadBankStyle  {background-color: #ffad46;}
-          .SABBStyle  {background-color: #b99aff;}
-          .SambaStyle  {background-color: #b6cff5;}
+          .alrajhibankStyle { background-color: #4986e7;}
+          .anbStyle { background-color: #a2dcc1;}
+          .fransismsStyle { background-color: #f2b2a8;}
+          .aljazirasmsStyle {background-color: #98d7e4;}
+          .riyadbankStyle  {background-color: #ffad46;}
+          .sabbStyle  {background-color: #b99aff;}
+          .sambaStyle  {background-color: #b6cff5;}
           
           .completedStyle  {background-color: #008d4c;}
           .refundStyle  {background-color: #f39c12;}
@@ -406,7 +406,7 @@
     return moment.tz(date,'Asia/Riyadh').format('Y-M-D H:m ');
   }
   function senderNameRender(senderName){
-    return '<span class="badge '+senderName.replace('.','')+'Style" >'+senderName+'</span>';
+    return '<span class="badge '+senderName.replace('.','').toLowerCase()+'Style" >'+senderName+'</span>';
   }
 
   function statusRender(status){

@@ -95,7 +95,7 @@ router.post('/ajaxList', function(req, res, next) {
         req.body.extraWhere.status = 'assigned';
     }
     if(req.body.bank)
-        req.body.extraWhere.senderName = req.body.bank; 
+        req.body.extraWhere.senderName = new RegExp('^'+req.body.bank+'$','i'); ; 
     if(req.body.ifBankAll)
         delete req.body.extraWhere.status;
     req.body.extraSelect = { status : 1};
