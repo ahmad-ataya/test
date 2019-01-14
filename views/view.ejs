@@ -135,7 +135,7 @@
             <li class="<% if(active == 'view' && !rep && !bank){ %> active <%}%>"><a href="/"><i class="fa fa-circle-o"></i>pending</a></li>
             <% banks.forEach(function(b){ %>
               <li class="<% if(bank == b.senderName && !ifBankAll){ %> active <%}%>"><a href="/?bank=<%=b.senderName%>"><i class="fa fa-circle-o"></i> 
-                <span class ="badge <%=b.senderName%>Style" ><%=b.title%></span></a>
+                <span class ="badge <%=b.senderName.toLowerCase()%>Style" ><%=b.title%></span></a>
               </li>
             <% }); %>
             <li class="<% if(active == 'refund'){ %> active <%}%>"><a href="/refund"><i class="fa fa-circle-o"></i> refund</a></li>
@@ -154,7 +154,7 @@
           <ul class="treeview-menu">
             <% banks.forEach(function(b){ %>
               <li class="<% if(bank == b.senderName && ifBankAll){ %> active <%}%>"><a href="/?bank=<%=b.senderName%>&ifBankAll=true"><i class="fa fa-circle-o"></i> 
-                <span class ="badge <%=b.senderName%>Style" ><%=b.title%></span></a>
+                <span class ="badge <%=b.senderName.toLowerCase()%>Style" ><%=b.title%></span></a>
               </li>
             <% }); %>
           </ul>
