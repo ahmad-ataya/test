@@ -18,6 +18,36 @@ cron.schedule('*/59 * * * *', () => {  // every 59 hours
     }); 
 });
 
+router.post('/newSms',function(req,res,next){
+    if(!req.body.data)
+        return res.status(200).json({response : 0, message : 'data not  found'});
+    if(!Array.isArray(req.body.data))
+        req.body.data = [req.body.data];
+
+    async.each(req.body.data, function(data, callback) {
+        Models.sms.create({
+            senderName : data.senderName,
+            text : data.text,
+            phone : data.phone,
+            from : data.from,
+            deviceEmitTime : data.deviceEmitTime,
+            creationDate : data.creationDate?new Date(data.creationDate) : undefined,
+            serviceCenterTime : data.serviceCenterTime
+        },function(err,sms){
+            if(err)
+                return callback(err);
+            // if(data.from)
+            //     socket.emit('newSms',sms);
+            io.emit('newSms',sms);
+            return callback(); 
+        });
+    }, function(err) {
+        if(err)
+            return  res.status(200).json({response : 0,message : err});
+        return  res.status(200).json({response : 1});
+    });
+});
+
 router.use('/auth', require('./auth'));
 
 //router.use('/users', require('./users'));
@@ -31,7 +61,7 @@ router.use(function(req,res,next){// refreshToken
 // ************************************************* isAdmin ********************************************************
     router.use('/banks', require('./banks'));
     router.use('/users', require('./users'));
-    router.get('/newSms',function(req,res){
+    router.get('/testSms',function(req,res){
         if(!req.user || !req.user.isAdmin)
             return res.status(500).json({message : 'permssionDenied'});
         return res.render('index')
