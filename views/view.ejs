@@ -406,6 +406,8 @@
     return moment.tz(date,'Asia/Riyadh').format('Y-M-D H:m ');
   }
   function senderNameRender(senderName){
+    if(!senderName)
+      senderName = "";
     return '<span class="badge '+senderName.replace('.','').toLowerCase()+'Style" >'+senderName+'</span>';
   }
 
