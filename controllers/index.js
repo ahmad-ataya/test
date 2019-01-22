@@ -19,13 +19,13 @@ cron.schedule('*/59 * * * *', () => {  // every 59 hours
 });
 
 router.post('/newSms',function(req,res,next){
+    console.log(req.body);
     if(!req.body.data)
         return res.status(200).json({response : 0, message : 'data not  found'});
     try{req.body.data = JSON.parse(req.body.data)}
     catch(e){return res.status(200).json({response : 0,message : 'can not parse'})}
 
-    console.log(req.body,req.body.data);
-    if(!Array.isArray(req.body.data));
+    if(!Array.isArray(req.body.data))
         req.body.data = [req.body.data];
 
     async.each(req.body.data, function(data, callback) {
@@ -53,7 +53,6 @@ router.post('/newSms',function(req,res,next){
 });
 
 router.use('/auth', require('./auth'));
-    router.use('/users', require('./users'));
 
 //router.use('/users', require('./users'));
 
@@ -65,6 +64,7 @@ router.use(function(req,res,next){// refreshToken
 });
 // ************************************************* isAdmin ********************************************************
     router.use('/banks', require('./banks'));
+    router.use('/users', require('./users'));
     router.get('/testSms',function(req,res){
         if(!req.user || !req.user.isAdmin)
             return res.status(500).json({message : 'permssionDenied'});

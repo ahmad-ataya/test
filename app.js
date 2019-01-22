@@ -12,7 +12,7 @@ var app = express();
 mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 ObjectId = mongoose.Types.ObjectId;
-var mongodbUrl = 'mongodb://localhost:27017/smsSocketTest';
+var mongodbUrl = 'mongodb://localhost:27017/smsSocket';
 mongoose.connect(mongodbUrl);
 
 
