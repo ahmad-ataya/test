@@ -21,6 +21,7 @@ cron.schedule('*/59 * * * *', () => {  // every 59 hours
 router.post('/newSms',function(req,res,next){
     if(!req.body.data)
         return res.status(200).json({response : 0, message : 'data not  found'});
+    try{req.body.data = JSON.parse(req.body.data)}catch(e){return res.status(200).json({response : 0,message : 'can not parse'})}
     if(!Array.isArray(req.body.data))
         req.body.data = [req.body.data];
 
