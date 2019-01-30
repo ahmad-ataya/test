@@ -25,25 +25,35 @@ router.post('/newSms',function(req,res,next){
     try{req.body.data = JSON.parse(req.body.data)}
     catch(e){return res.status(200).json({response : 0,message : 'can not parse'})}
 
-    if(!Array.isArray(req.body.data))
-        req.body.data = [req.body.data];
+    // if(!Array.isArray(req.body.data))
+    //     req.body.data = [req.body.data];
 
     async.each(req.body.data, function(data, callback) {
-        Models.sms.create({
-            senderName : data.senderName,
-            text : data.text,
-            phone : data.phone,
-            from : data.from,
-            deviceEmitTime : data.deviceEmitTime,
-            creationDate : data.creationDate?new Date(data.creationDate) : undefined,
-            serviceCenterTime : data.serviceCenterTime
-        },function(err,sms){
+        Models.sms.findOne({mobileId : data.id, senderName: data.senderName},function(err,oldSms){
             if(err)
                 return callback(err);
-            // if(data.from)
-            //     socket.emit('newSms',sms);
-            io.emit('newSms',sms);
-            return callback(); 
+            if(oldSms){
+                console.log("repeateSms : ",oldSms,data);
+                return callback(); 
+            }
+
+            Models.sms.create({
+                mobileId : data.id,
+                senderName : data.senderName,
+                text : data.text,
+                phone : data.phone,
+                from : data.from,
+                deviceEmitTime : data.deviceEmitTime,
+                creationDate : data.creationDate?new Date(data.creationDate) : undefined,
+                serviceCenterTime : data.serviceCenterTime
+            },function(err,sms){
+                if(err)
+                    return callback(err);
+                // if(data.from)
+                //     socket.emit('newSms',sms);
+                io.emit('newSms',sms);
+                return callback(); 
+            });
         });
     }, function(err) {
         if(err)

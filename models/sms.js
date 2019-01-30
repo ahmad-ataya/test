@@ -1,5 +1,6 @@
 
 var smsSchema = new mongoose.Schema({
+    mobileId : String,
 	senderName : String,
 	text : String,
     status: {
@@ -26,6 +27,7 @@ var smsSchema = new mongoose.Schema({
     creationDate : {type: Date, default: Date.now}
 });
 
+smsSchema.index({ mobileId: 1 });
 smsSchema.index({ status: 1 });
 smsSchema.index({ senderName: 1 });
 
