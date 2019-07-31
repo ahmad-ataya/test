@@ -462,7 +462,7 @@
   $(function () {
     $('.representativeSelect').select2();
     $('.banksFilter').select2();
-    var table = $('#example2').DataTable({
+     var table = $('#example2').DataTable({
       serverSide : true,
       lengthMenu: [ 100, 10,50, 200 ],
       ajax : {
@@ -492,8 +492,8 @@
     $('.banksFilter').change(function(){
       var banksSearch = $(this).val();
       if(banksSearch){
-        console.log(banksSearch.join('|'));
-        table.columns(1).search(banksSearch.join('|')).draw();
+       // console.log(banksSearch.join('|'));
+       console.log( table.columns(1).search(banksSearch.join('|')).draw());
       }
     })
 
