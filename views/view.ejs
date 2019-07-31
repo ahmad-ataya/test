@@ -491,10 +491,8 @@
 
     $('.banksFilter').change(function(){
       var banksSearch = $(this).val();
-      if(banksSearch){
-       // console.log(banksSearch.join('|'));
+      if(banksSearch)
        console.log( table.columns(1).search(banksSearch.join('|')).draw());
-      }
     })
 
     $('#example2').on('click','.completeAction',function(){
@@ -698,6 +696,10 @@
       });
       socket.on('newSms',function(data){
         if(activePage == 'view' &&  !rep && (!bank || data.senderName == bank)){
+          var banksFilter = $('.banksFilter');
+          if(banksFilter && banksFilter.val().length && banksFilter.val().indexOf(data.senderName) == -1 )
+            return;
+
           infoPage = table.page.info();
           node = table.row.add(data);
           if(infoPage.page == 0)
