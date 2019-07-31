@@ -196,9 +196,19 @@
             <div class="box-header">
               <h3 class="box-title"></h3>
             </div>
-            <div class="row">
-              <div class="col-xs-10 col-md-11 "></div>
-              <button class="btn btn-success" data-toggle="modal" data-target="#modal-add-hawala">Add</button>
+            <div class="row" style="margin-right: 15px; margin-left: 10px;">
+              <!-- <div class="col-xs-8 col-md-9 "></div> -->
+              <button class="btn btn-success" style="float: right;" data-toggle="modal" data-target="#modal-add-hawala">Add</button>
+              <% if(active == 'view' && !rep && !bank) { %>
+                <div class="col-xs-4 col-md-2" style="float: left;">
+                  <select class="banksFilter form-control" multiple="multiple">
+                    <% banks.forEach(function(b){ %>
+                      <option value="<%=b.senderName%>"><%= b.title%></option>
+                    <% }); %>
+                  </select>
+                </div>
+              <% } %>
+
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -451,6 +461,7 @@
   }
   $(function () {
     $('.representativeSelect').select2();
+    $('.banksFilter').select2();
     var table = $('#example2').DataTable({
       serverSide : true,
       lengthMenu: [ 100, 10,50, 200 ],
@@ -477,6 +488,14 @@
       info        : true,
       autoWidth   : false
     });
+
+    $('.banksFilter').change(function(){
+      var banksSearch = $(this).val();
+      if(banksSearch){
+        console.log(banksSearch.join('|'));
+        table.columns(1).search(banksSearch.join('|')).draw();
+      }
+    })
 
     $('#example2').on('click','.completeAction',function(){
       var node  = $(this);
