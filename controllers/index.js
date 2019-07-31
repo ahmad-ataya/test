@@ -134,6 +134,10 @@ router.post('/ajaxList', function(req, res, next) {
             req.body.activePage = 'pending';
     
     req.body.extraWhere = { status : req.body.activePage};
+
+    if(req.body.columns[1].search.value)
+        req.body.extraWhere.senderName = {$in : req.body.columns[1].search.value.split('|')}
+
     if(req.body.rep){
         req.body.extraWhere.toRepresentative = req.body.rep; 
         req.body.extraWhere.status = 'assigned';
