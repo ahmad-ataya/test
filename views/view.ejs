@@ -697,7 +697,7 @@
       socket.on('newSms',function(data){
         if(activePage == 'view' &&  !rep && (!bank || data.senderName == bank)){
           var banksFilter = $('.banksFilter');
-          if(banksFilter && banksFilter.val().length && banksFilter.val().indexOf(data.senderName) == -1 )
+          if(banksFilter && banksFilter.val() && banksFilter.val().length && banksFilter.val().indexOf(data.senderName) == -1 )
             return;
 
           infoPage = table.page.info();
