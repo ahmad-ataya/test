@@ -139,7 +139,7 @@ router.post('/ajaxList', function(req, res, next) {
         var searchValues = req.body.columns[1].search.value.split('|');
         var searchValues2 = [];
         _.each(searchValues,(v)=>{searchValues2.push(v.trim())});
-        req.body.extraWhere.senderName = {$in : }
+        req.body.extraWhere.senderName = {$in : searchValues2}
     }
 
     if(req.body.rep){
