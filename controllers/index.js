@@ -135,13 +135,8 @@ router.post('/ajaxList', function(req, res, next) {
     
     req.body.extraWhere = { status : req.body.activePage};
 
-    if(req.body.columns[1].search.value){
-        var searchValues = req.body.columns[1].search.value.split('|');
-        var searchValues2 = [];
-        _.each(searchValues,(v)=>{searchValues2.push(v.trim())});
-        console.log(searchValues2);
-        req.body.extraWhere.senderName = {$in : searchValues2}
-    }
+    if(req.body.columns[1].search.value)
+        req.body.extraWhere.senderName = {$in : req.body.columns[1].search.value.split('|')}
 
     if(req.body.rep){
         req.body.extraWhere.toRepresentative = req.body.rep; 
