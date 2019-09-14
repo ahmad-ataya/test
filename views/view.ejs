@@ -464,7 +464,7 @@
     $('.banksFilter').select2();
      var table = $('#example2').DataTable({
       serverSide : true,
-      lengthMenu: [ 100, 10,50, 200 ],
+      lengthMenu: [ 100, 10,50, 200,500 ],
       ajax : {
         url : '/ajaxList',
         type : 'POST',
@@ -488,6 +488,7 @@
       info        : true,
       autoWidth   : false
     });
+    $.fn.DataTable.ext.pager.numbers_length = 20;
 
     $('.banksFilter').change(function(){
       var banksSearch = $(this).val();
