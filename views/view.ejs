@@ -415,6 +415,7 @@
   var ifBankAll = "<%=ifBankAll%>";
   
   var uncompleteButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo complete</button>':'';
+  var removeButton = isAdmin?'<button class="removeAction btn btn-flat btn-info">remove</button>':'';
   var unRefundButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo refund</button>':'';
   var unAssignButton = isAdmin?'<button class="uncompleteAction btn btn-flat btn-danger">undo assign</button>':'';
   var completeButton = '<button class=" completeAction btn btn-flat btn-success">complete</button>';
@@ -441,9 +442,9 @@
       return '<span class="badge '+status+'Style" >'+status+'</span>';
     }
     if(status == 'completed')
-      return uncompleteButton;
+      return uncompleteButton+removeButton;
     if(status == 'refund')
-      return noteButton+unRefundButton;
+      return noteButton+unRefundButton+removeButton;
     if(status == 'withoutOrders')
       return completeButton+noteButton+refundButton+assignButton;
     if(status == 'assigned')
@@ -556,6 +557,32 @@
             },
             function(data, status,xhr){
               if(xhr.status == 200){
+                table.row( node.parents('tr') ).remove().draw();
+              }
+              else
+                alert("error "+data.message);
+          });
+        }
+      },20);  
+    });
+
+     $('#example2').on('click','.removeAction',function(){
+      var node  = $(this);
+
+      node.parents('tr').addClass('completeHighlight')
+
+      setTimeout(function(){
+        var smsId = node.parents('tr').attr('smsId');
+        var cpnfirmation = confirm("are you shure to remove this #"+smsId.substr(18));
+        node.parents('tr').removeClass('completeHighlight')
+        
+        if(cpnfirmation){
+          $.post("/sms/removeSms",{
+              smsId: smsId
+            },
+            function(data, status,xhr){
+              if(xhr.status == 202){
+                console.log("ASDASDASDASD",smsId);
                 table.row( node.parents('tr') ).remove().draw();
               }
               else

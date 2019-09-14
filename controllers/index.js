@@ -273,4 +273,19 @@ router.delete('/sms/:smsId/notes/:note',function(req,res,next){
         });
     }); 
 });
+
+router.post('/sms/removeSms',function(req,res,next){
+    console.log("AS"); 
+    Models.sms.findOne({_id: ObjectId(req.body.smsId)},function(err,sms){
+        if(err)
+            return res.status(500).json(err);
+
+        sms.remove(function(err){
+            if(err)
+                return res.status(500).json(err);
+            return res.status(202).json({message : 'done'});
+        });
+
+    }); 
+});
 module.exports = router;
