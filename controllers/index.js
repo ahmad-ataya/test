@@ -137,6 +137,10 @@ router.post('/ajaxList', function(req, res, next) {
 
     if(req.body.columns[1].search.value)
         req.body.extraWhere.senderName = {$in : req.body.columns[1].search.value.split('|')}
+    if(req.body.columns[4].search.value){
+        var dateFilter = req.body.columns[4].search.value.split('-');
+        req.body.extraWhere.creationDate = {$gte :new Date(dateFilter[0]), $lte : new Date(dateFilter[1])}
+    }
 
     if(req.body.rep){
         req.body.extraWhere.toRepresentative = req.body.rep; 

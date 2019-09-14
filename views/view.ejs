@@ -22,6 +22,8 @@
   <!-- select -->
 <link rel="stylesheet" href="/template/bower_components/select2/dist/css/select2.min.css">
 
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
   
 
   <!-- Google Font -->
@@ -201,6 +203,7 @@
               <button class="btn btn-success" style="float: right;" data-toggle="modal" data-target="#modal-add-hawala">Add</button>
               <% if(active == 'view' && !rep && !bank) { %>
                 <div class="col-xs-4 col-md-2" style="float: left;">
+                  <span class="form-label">Banks Filter</span>
                   <select class="banksFilter form-control" multiple="multiple">
                     <% banks.forEach(function(b){ %>
                       <option value="<%=b.senderName%>"><%= b.title%></option>
@@ -208,6 +211,10 @@
                   </select>
                 </div>
               <% } %>
+              <div class="col-xs-4 col-md-2" style="float: left;">
+                <span class="form-label">Date Filter</span>
+                <input type="text" id="dateFilter" class="form-control" name="daterange" value="01/01/2018 - 01/15/2018" />
+              </div>
 
             </div>
             <!-- /.box-header -->
@@ -397,6 +404,9 @@
 <script src="/javascripts/socket.io.js"></script>
 <script src="/javascripts/moment.js"></script>
 <script src="/javascripts/moment-timezone.js"></script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
 <script>
   var activePage = "<%=active%>";
   var isAdmin = ("<%=user.isAdmin%>" == 'true');
@@ -420,6 +430,8 @@
       senderName = "";
     return '<span class="badge '+senderName.replace('.','').toLowerCase()+'Style" >'+senderName+'</span>';
   }
+
+  $('#dateFilter').daterangepicker();
 
   function statusRender(status){
     if(bank){
@@ -494,6 +506,12 @@
       var banksSearch = $(this).val();
       if(banksSearch)
        console.log( table.columns(1).search(banksSearch.join('|')).draw());
+    })
+
+    $('#dateFilter').change(function(){
+      var dateFilter = $(this).val();
+      if(dateFilter)
+       table.columns(4).search(dateFilter).draw();
     })
 
     $('#example2').on('click','.completeAction',function(){
